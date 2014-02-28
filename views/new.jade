@@ -1,0 +1,10 @@
+form(method="POST", action="/new")
+  p Latitude
+    input(type="number" step="any" name="lat" required)
+  p Longitude
+    input(type="number" step="any" name="long" required)
+  p Rating
+    input(type="number" min="0" max="10" name="rating" required)
+
+  p
+    input(type="submit")
