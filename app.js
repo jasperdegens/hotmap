@@ -14,6 +14,7 @@ var app = express();
 
 
 var pg_url = process.env.DATABASE_URL || 'postgresql://localhost/test';
+console.log(pg_url);
 var client = new pg.Client(pg_url);
 client.connect(function(err){
   if(err){
