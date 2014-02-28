@@ -8,29 +8,45 @@ var routes = require('./routes');
 var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
-var mysql = require('mysql');
+// var mysql = require('mysql');
+var pg = require('pg');
 var app = express();
 
-var connection = mysql.createConnection({
-  host     : 'localhost',
-  port     : 3306,
-  user     : 'root',
-  password : '',
-  database : 'test'
+
+var pg_url = process.env.DATABASE_URL || 'postgresql://localhost/test';
+var client = new pg.Client(pg_url);
+client.connect(function(err){
+  if(err){
+    console.log(err);
+  }
+  client.query("SELECT * from hotmap", function(err, result){
+    if(err){
+      console.log(err);
+    }
+    console.log(result.rows);
+  });
 });
+// var connection = mysql.createConnection({
+//   host     : 'localhost',
+//   port     : 3306,
+//   user     : 'root',
+//   password : '',
+//   database : 'test'
+// });
 
 // connection.query('USE test_database');
 
-connection.connect(function(err){
-        if(err !== null) {
-            console.log('Error connecting to mysql:' + err+'\n');
-        }
-      });
+// connection.connect(function(err){
+//         if(err !== null) {
+//             console.log('Error connecting to mysql:' + err+'\n');
+//         }
+//       });
 
 
-
+// createTable = "CREATE table hotmap (latitude decimal(10, 8) NOT NULL, longitude decimal(11, 8) NOT NULL, rating tinyint, deciveID varchar(100), created TIMESTAMP DEFAULT NOW());"
 
 // all environments
+
 app.set('port', process.env.PORT || 3000);
 // app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -49,15 +65,14 @@ if ('development' == app.get('env')) {
 
 // app.get('/', routes.index);
 app.get('/',  function(req, res){
-  connection.query("SELECT * from hotmap", function(err, rows){
-    res.render('index', {title: 'hotmap', data: rows});
+  client.query("SELECT * from hotmap", function(err, result){
+    res.render('index', {title: 'hotmap', data: result.rows});
   });
 });
 
 app.get('/new', function(req, res){
   res.render('new');
 });
-
 
 app.post('/new', function(req, res){
   // console.log(req.body);
@@ -66,7 +81,7 @@ app.post('/new', function(req, res){
                     ',' + req.body.long + ',' + req.body.rating +
                     ',"computer")';
   console.log(query);
-  connection.query(query, function(err, results){
+  client.query(query, function(err, results){
     if(err !== null){
       console.log("ERROR" + err);
     } else {
@@ -76,8 +91,8 @@ app.post('/new', function(req, res){
 });
 
 app.get('/all', function(req, res){
-  connection.query("SELECT * from hotmap", function(err, rows){
-    res.json(rows);
+  client.query("SELECT * from hotmap", function(err, result){
+    res.json(result.rows);
   });
 });
 
@@ -91,12 +106,12 @@ app.get('/nearby', function(req, res){
                 (latitude + 1) + ') AND (longitude BETWEEN ' + (longitude - 1) + ' AND ' +
                 (longitude + 1) + ')';
   console.log(query);
-  connection.query(query, function(err, results){
+  client.query(query, function(err, results){
     if(err !== null){
       // ERROR HANDLING HERE
       console.log(err);
     } else {
-      res.json(results);
+      res.json(results.rows);
     }
   });
 });
