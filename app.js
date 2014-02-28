@@ -78,13 +78,13 @@ app.get('/new', function(req, res){
 app.post('/new', function(req, res){
   // console.log(req.body);
   var query = "INSERT INTO hotmap(latitude, longitude, " +
-                    "rating, deviceID) VALUES(" + req.body.lat +
-                    ',' + req.body.long + ',' + req.body.rating +
-                    ',"computer")';
+                    "rating, deviceID) VALUES(" + req.body.latitude +
+                    ', ' + req.body.longitude + ', ' + req.body.rating +
+                    ", 'computer')";
   console.log(query);
   client.query(query, function(err, results){
     if(err !== null){
-      console.log("ERROR" + err);
+      console.log("ERROR: " + err);
     } else {
       res.render('success');
     }
