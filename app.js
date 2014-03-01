@@ -80,7 +80,7 @@ app.post('/new', function(req, res){
   var query = "INSERT INTO hotmap(latitude, longitude, " +
                     "rating, deviceID) VALUES(" + req.body.latitude +
                     ', ' + req.body.longitude + ', ' + req.body.rating +
-                    ', ' + req.body.deviceID + ')';
+                    ", '" + req.body.deviceID + "')";
   console.log(query);
   client.query(query, function(err, results){
     if(err !== null){
